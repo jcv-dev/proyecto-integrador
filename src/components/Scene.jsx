@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 
 function MovingBox() {
@@ -24,7 +24,7 @@ function MovingBox() {
   return (
     <mesh ref={meshRef} scale={0.3}>
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="green" />
+      <meshStandardMaterial color="blue" />
     </mesh>
   );
 }
