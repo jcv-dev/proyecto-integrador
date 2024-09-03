@@ -6,25 +6,25 @@ function MovingBox() {
   const [direction, setDirection] = useState(1)
 
   useFrame(({ clock }) => {
-    // Obtener el tiempo transcurrido
+ 
     const time = clock.getElapsedTime();
-    const speed = 1; // Velocidad del movimiento en x
-    const amplitude = 5; // Amplitud del movimiento en x
+    const speed = 1; 
+    const amplitude = 5; 
 
     // Movimiento en el eje x (rebote)
-    meshRef.current.position.x += direction * speed * 0.05; // Ajusta la velocidad del movimiento
+    meshRef.current.position.x += direction * speed * 0.05; 
     if (meshRef.current.position.x > amplitude || meshRef.current.position.x < -amplitude) {
-      setDirection(direction * -1); // Cambia la dirección del movimiento
+      setDirection(direction * -1); 
     }
 
-    // Mover la caja en el eje y (de arriba hacia abajo) usando coseno
-    meshRef.current.position.y = Math.cos(time * 2) * 2; // Multiplica por 2 para ajustar el rango del movimiento
+ 
+    meshRef.current.position.y = Math.cos(time * 2) * 2; 
   });
 
   return (
     <mesh ref={meshRef} scale={0.3}>
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="blue" />
+      <meshLambertMaterial color="blue" />
     </mesh>
   );
 }
