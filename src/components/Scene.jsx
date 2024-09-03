@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
+import { FirstPersonControls } from "@react-three/drei";
 
 function MovingBox() {
   const meshRef = useRef();
@@ -30,9 +31,15 @@ function MovingBox() {
 }
 
 function Scene() {
+  const cameraSettings = {
+    position: [2, 0, 5],
+  };
+
   return (
-    <Canvas style={{ width: '100vw', height: '100vh', display: 'block' }}>
+    <Canvas style={{ width: '100vw', height: '100vh', display: 'block' }} camera={cameraSettings}>
       {/* Lighting */}
+      <FirstPersonControls enablePan={false} />
+      <ambientLight intensity={1.5} />
       <directionalLight position={[5, 5, 5]} intensity={2} />
       <ambientLight intensity={0.5} />
 
