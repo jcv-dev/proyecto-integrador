@@ -1,6 +1,7 @@
 import { auth, googleProvider, signInWithPopup, db, doc, getDoc, setDoc } from "../config/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import useStore from "../stores/userStore";
+import '../css/Login.css';
 
 function Login() {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ function Login() {
   };
 
   return (
-    <div>
+    <div className="container">
       <h2>Iniciar Sesión</h2>
       <button onClick={handleGoogleSignIn}>Iniciar Sesión con Google</button>
     </div>
