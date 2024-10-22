@@ -8,13 +8,13 @@ import {
   setDoc,
 } from "../config/firebaseConfig";
 import { useNavigate } from "react-router-dom";
-import useStore from "../stores/userStore";
+import userStore from "../stores/userStore";
 import "../css/Login.css";
 import googleIcon from "../assets/google-icon.svg";
 
 function Login() {
   const navigate = useNavigate();
-  const setUser = useStore((state) => state.setUser);
+  const setUser = userStore((state) => state.setUser);
 
   const handleGoogleSignIn = async () => {
     try {

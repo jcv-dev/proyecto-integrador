@@ -1,8 +1,8 @@
 import {create} from "zustand";
 
-const useStore = create((set) => ({
+const userStore = create((set) => ({
   user: null,
   setUser: (user) => set({ user }),
 }));
 
-export default useStore;
+export default userStore;
