@@ -1,16 +1,18 @@
 import Scene from "./Scene";
-import useStore from "../stores/userStore";
+import userStore from "../stores/userStore";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
-
-    const user = useStore((state) => state.user)
-
-    return (
-        <div>
-          <h1>Bienvenido, {user?.displayName}</h1>
-          <Scene />
-        </div>
-      );
-    }
+  const user = userStore((state) => state.user);
+  const navigate = useNavigate();
+  console.log("User signed in HOME:", user);
+  return (
+    <div>
+      <h1>Bienvenido, {user?.displayName}</h1>
+      <Scene />
+      <div onClick={() => navigate("/test")}>IR A TEST</div>
+    </div>
+  );
+}
 
 export default Home;
