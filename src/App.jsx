@@ -4,9 +4,9 @@ import Home from "./components/Home";
 
 function App() {
   return (
-    <Router basename="/">
+    <Router>
       <Routes>
-        <Route path="/" element={<Login />} />  
+        <Route path="/" element={<Login />} />
         <Route path="/home" element={<Home />} />
       </Routes>
     </Router>
