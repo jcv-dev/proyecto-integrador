@@ -55,10 +55,8 @@ function Login() {
         <h2>Por favor inicia sesión.</h2>
       </div>
       <div className="login-button-container">
-        <div className="google-icon-border">
-          <img src={googleIcon} alt="Icono de Google" title="Iniciar Sesion" />
-        </div>
-        <button onClick={handleGoogleSignIn}>Entrar con Google</button>
+        <img src={googleIcon} alt="Icono de Google" onClick={handleGoogleSignIn} />
+        <p onClick={handleGoogleSignIn}>Entrar con Google</p>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 * {
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
 
 .login {
@@ -21,6 +21,7 @@
   text-align: center;
   margin-bottom: 30px;
   margin-top: -4%;
+  display: block;
 }
 
 .title h2 {
@@ -30,9 +31,11 @@
 
 .login-button-container {
   /*outline: auto; */
+  position: relative;
   width: 22vw;
   min-width: 200px;
   height: 50vh;
+  min-height: 400px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -40,7 +43,8 @@
   justify-content: center;
   border-radius: 25px;
   box-shadow: -20px 20px 8px rgba(0, 0, 0, 0.25),
-  5px -5px 8px rgba(0, 0, 0, 0.25);
+    5px -5px 8px rgba(0, 0, 0, 0.25);
+  background-color: #1e1e24;
 }
 
 @media (max-width: 768px) {
@@ -51,45 +55,43 @@
 }
 
 .login-button-container img {
-  width: 101%;
+  width: 60%;
   height: auto;
+  max-height: 60%;
   border-radius: 100%;
   margin-bottom: -3%;
-  background-color: #1E1E24;
-  background-repeat: no-repeat;
-  background-size: 90%;
+  cursor: pointer;
 }
 
 @property --angle {
-  syntax: '<angle>';
+  syntax: "<angle>";
   initial-value: 0deg;
   inherits: false;
 }
 
-.login-button-container::after, .login-button-container::before {
-  content: '';
+.login-button-container::after,
+.login-button-container::before {
+  content: "";
   position: absolute;
+  inset: -4px;
   border-radius: 25px;
-  height: 100%;
-  width: 100%;
-  top: 50%;
-  left: 50%;
-  translate: -50%, -50%;
-  z-index: -2;
-  padding: 2px;
-  background-image: conic-gradient(from var(--angle),
-    #fbbc05,
-    #ea4335,
-    #34a853,
+  background-image: conic-gradient(
+    from var(--angle),
+    transparent 0% 25%,
+    #fbbc05 ,
+    #ea4335 ,
+    #34a853 ,
+    #4285f4 ,
     #4285f4 
   );
-  animation: 3s spin linear infinite;
-  display: none;
+  animation: spin 3s linear infinite;
+  opacity: 0;
+  transition: opacity 1s ease; 
+  z-index: -1;
 }
 
 .login-button-container::before {
-  filter: blur(1.5rem);
-  opacity: 0.8;
+  filter: blur(1rem);
 }
 
 @keyframes spin {
@@ -101,14 +103,22 @@
   }
 }
 
-.login-button-container:hover::after, .login-button-container:hover::before {
-  display: block;
+.login-button-container:hover::after,
+.login-button-container:hover::before {
+  opacity: 1; 
 }
-
 
 .login-button-container button {
   margin-top: 5%;
   background-color: transparent;
   font-weight: 600;
-  font-size: clamp(16px, 3.5vw, 24px); 
+  font-size: clamp(16px, 3.5vw, 24px);
+}
+
+.login-button-container p {
+  margin-top: 10%;
+  background-color: transparent;
+  font-weight: 600;
+  font-size: clamp(16px, 3.5vw, 24px);
+  cursor: pointer;
 }
