@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 function Home() {
   const user = userStore((state) => state.user);
   const navigate = useNavigate();
-  console.log("User signed in HOME:", user);
   return (
     <div>
       <h1>Bienvenido, {user?.displayName}</h1>

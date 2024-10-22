@@ -42,8 +42,6 @@ function Login() {
         photoURL: user.photoURL,
       });
 
-      console.log("User signed in AFTER AUTH:", user);
-
       navigate("/home");
     } catch (error) {
       console.error("Error al iniciar sesión con Google.:", error);
@@ -57,7 +55,11 @@ function Login() {
         <h2>Por favor inicia sesión.</h2>
       </div>
       <div className="login-button-container">
-        <img src={googleIcon} alt="Icono de Google" onClick={handleGoogleSignIn} />
+        <img
+          src={googleIcon}
+          alt="Icono de Google"
+          onClick={handleGoogleSignIn}
+        />
         <p onClick={handleGoogleSignIn}>Entrar con Google</p>
       </div>
     </div>
