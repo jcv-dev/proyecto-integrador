@@ -1,7 +1,16 @@
-import { auth, googleProvider, signInWithPopup, db, doc, getDoc, setDoc } from "../config/firebaseConfig";
+import {
+  auth,
+  googleProvider,
+  signInWithPopup,
+  db,
+  doc,
+  getDoc,
+  setDoc,
+} from "../config/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import useStore from "../stores/userStore";
-import '../css/Login.css';
+import "../css/Login.css";
+import googleIcon from "../assets/google-icon.svg";
 
 function Login() {
   const navigate = useNavigate();
@@ -33,8 +42,6 @@ function Login() {
         photoURL: user.photoURL,
       });
 
-      console.log(user.photoURL)
-
       navigate("/home");
     } catch (error) {
       console.error("Error al iniciar sesión con Google.:", error);
@@ -42,9 +49,15 @@ function Login() {
   };
 
   return (
-    <div className="container">
-      <h2>Iniciar Sesión</h2>
-      <button onClick={handleGoogleSignIn}>Iniciar Sesión con Google</button>
+    <div className="login">
+      <div className="title">
+        <h2>¡Hola!</h2>
+        <h2>Por favor inicia sesión.</h2>
+      </div>
+      <div className="login-button-container">
+        <img src={googleIcon} alt="Icono de Google" onClick={handleGoogleSignIn} />
+        <p onClick={handleGoogleSignIn}>Entrar con Google</p>
+      </div>
     </div>
   );
 }

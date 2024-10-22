@@ -1,8 +1,124 @@
-.container {
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centers the items horizontally */
-    justify-content: center; /* Centers the items vertically (if the container has height) */
-    height: 100vh; /* Optional: make the container take the full height of the viewport */
+* {
+  font-family: "Open Sans", sans-serif;
+}
+
+.login {
+  outline: auto;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  position: relative;
+  width: 100vw;
+  height: auto;
+  line-height: 1;
+  text-align: center;
+  margin-bottom: 30px;
+  margin-top: -4%;
+  display: block;
+}
+
+.title h2 {
+  font-weight: 800;
+  font-size: clamp(24px, 6vw, 48px); /* Tamaño de fuente adaptativo */
+}
+
+.login-button-container {
+  /*outline: auto; */
+  position: relative;
+  width: 22vw;
+  min-width: 200px;
+  height: 50vh;
+  min-height: 400px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 25px;
+  box-shadow: -20px 20px 8px rgba(0, 0, 0, 0.25),
+    5px -5px 8px rgba(0, 0, 0, 0.25);
+  background-color: #1e1e24;
+}
+
+@media (max-width: 768px) {
+  .login-button-container {
+    width: 70vw;
+    height: 40vh;
   }
+}
+
+.login-button-container img {
+  width: 60%;
+  height: auto;
+  max-height: 60%;
+  border-radius: 100%;
+  margin-bottom: -3%;
+  cursor: pointer;
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.login-button-container::after,
+.login-button-container::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 25px;
+  background-image: conic-gradient(
+    from var(--angle),
+    transparent 0% 25%,
+    #fbbc05 ,
+    #ea4335 ,
+    #34a853 ,
+    #4285f4 ,
+    #4285f4 
+  );
+  animation: spin 3s linear infinite;
+  opacity: 0;
+  transition: opacity 1s ease; 
+  z-index: -1;
+}
+
+.login-button-container::before {
+  filter: blur(1rem);
+}
+
+@keyframes spin {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
+}
+
+.login-button-container:hover::after,
+.login-button-container:hover::before {
+  opacity: 1; 
+}
+
+.login-button-container button {
+  margin-top: 5%;
+  background-color: transparent;
+  font-weight: 600;
+  font-size: clamp(16px, 3.5vw, 24px);
+}
+
+.login-button-container p {
+  margin-top: 10%;
+  background-color: transparent;
+  font-weight: 600;
+  font-size: clamp(16px, 3.5vw, 24px);
+  cursor: pointer;
+}
