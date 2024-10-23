@@ -60,15 +60,16 @@ function Login() {
   useEffect(() => {
     const fetchUser = async () => {
       const firebaseUser = await checkAuthState();
-      console.log("Hola");
       if (firebaseUser) {
         navigate("/home");
       }
-      setIsFadingOut(true);
-
+      
       setTimeout(() => {
-        setIsLoading(false);
-      }, 500);
+        setIsFadingOut(true);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 500);
+      }, 200);
     };
 
     fetchUser();

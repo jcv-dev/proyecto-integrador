@@ -23,21 +23,22 @@ const RequireAuth = () => {
       } else {
         setUser(null);
       }
-      
-      setIsFadingOut(true);
+
       setTimeout(() => {
-        console.log('hola');
-        setIsLoading(false);
-      }, 500)
+        setIsFadingOut(true);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 500);
+      }, 200);
     };
 
     fetchUser();
-  }, [setUser]);
+  }, []);
 
   if (isLoading) {
     return <Loading isFadingOut={isFadingOut} />;
   }
- 
+
   return currentUser ? <Outlet /> : <Navigate to="/" replace />;
 };
 
