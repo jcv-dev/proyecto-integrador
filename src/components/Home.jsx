@@ -1,15 +1,15 @@
 import Scene from "./Scene";
 import userStore from "../stores/userStore";
-import { useNavigate } from "react-router-dom";
+import useSignOutAndNavigate from "../hooks/useSignOutAndNavigate";
 
 function Home() {
   const user = userStore((state) => state.user);
-  const navigate = useNavigate();
+  const signOutAndNavigate = useSignOutAndNavigate();
   return (
     <div>
       <h1>Bienvenido, {user?.displayName}</h1>
       <Scene />
-      <div onClick={() => navigate("/test")}>IR A TEST</div>
+      <div onClick={() => signOutAndNavigate()}>Cerrar sesión</div>
     </div>
   );
 }

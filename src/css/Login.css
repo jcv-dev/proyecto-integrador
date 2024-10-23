@@ -71,15 +71,15 @@
   background-image: conic-gradient(
     from var(--angle),
     transparent 0% 25%,
-    #fbbc05 ,
-    #ea4335 ,
-    #34a853 ,
-    #4285f4 ,
-    #4285f4 
+    #fbbc05,
+    #ea4335,
+    #34a853,
+    #4285f4,
+    #4285f4
   );
   animation: spin 3s linear infinite;
   opacity: 0;
-  transition: opacity 1s ease; 
+  transition: opacity 1s ease;
   z-index: -1;
 }
 
@@ -98,7 +98,7 @@
 
 .login-button-container:hover::after,
 .login-button-container:hover::before {
-  opacity: 1; 
+  opacity: 1;
 }
 
 .login-button-container button {

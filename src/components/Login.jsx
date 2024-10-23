@@ -6,18 +6,27 @@ import {
   doc,
   getDoc,
   setDoc,
+  browserLocalPersistence,
+  setPersistence,
 } from "../config/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import userStore from "../stores/userStore";
 import "../css/Login.css";
 import googleIcon from "../assets/google-icon.svg";
+import { useEffect, useState } from "react";
+import checkAuthState from "../functions/authState";
+import Loading from "./Loading";
 
 function Login() {
   const navigate = useNavigate();
   const setUser = userStore((state) => state.setUser);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
   const handleGoogleSignIn = async () => {
     try {
+      await setPersistence(auth, browserLocalPersistence);
+
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
@@ -47,6 +56,27 @@ function Login() {
       console.error("Error al iniciar sesión con Google.:", error);
     }
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const firebaseUser = await checkAuthState();
+      console.log("Hola");
+      if (firebaseUser) {
+        navigate("/home");
+      }
+      setIsFadingOut(true);
+
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+    };
+
+    fetchUser();
+  }, []);
+
+  if (isLoading) {
+    return <Loading isFadingOut={isFadingOut} />;
+  }
 
   return (
     <div className="login">
