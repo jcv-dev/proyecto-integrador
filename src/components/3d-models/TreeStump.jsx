@@ -2,7 +2,7 @@ import { useGLTF } from "@react-three/drei";
 import { useMemo } from "react";
 
 export function TreeStump(props) {
-  const {nodes, materials} = useGLTF("../../../public/models/tree_stump.glb");
+  const {nodes, materials} = useGLTF("/models/tree_stump.glb");
  
   return (
     <group {...props} dispose={null}>
