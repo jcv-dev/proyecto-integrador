@@ -6,18 +6,27 @@ import {
   doc,
   getDoc,
   setDoc,
+  browserLocalPersistence,
+  setPersistence,
 } from "../config/firebaseConfig";
 import { useNavigate } from "react-router-dom";
-import useStore from "../stores/userStore";
+import userStore from "../stores/userStore";
 import "../css/Login.css";
 import googleIcon from "../assets/google-icon.svg";
+import { useEffect, useState } from "react";
+import checkAuthState from "../functions/authState";
+import Loading from "./Loading";
 
 function Login() {
   const navigate = useNavigate();
-  const setUser = useStore((state) => state.setUser);
+  const setUser = userStore((state) => state.setUser);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
   const handleGoogleSignIn = async () => {
     try {
+      await setPersistence(auth, browserLocalPersistence);
+
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
@@ -48,6 +57,28 @@ function Login() {
     }
   };
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      const firebaseUser = await checkAuthState();
+      if (firebaseUser) {
+        navigate("/home");
+      }
+      
+      setTimeout(() => {
+        setIsFadingOut(true);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 500);
+      }, 200);
+    };
+
+    fetchUser();
+  }, []);
+
+  if (isLoading) {
+    return <Loading isFadingOut={isFadingOut} />;
+  }
+
   return (
     <div className="login">
       <div className="title">
@@ -55,7 +86,11 @@ function Login() {
         <h2>Por favor inicia sesión.</h2>
       </div>
       <div className="login-button-container">
-        <img src={googleIcon} alt="Icono de Google" onClick={handleGoogleSignIn} />
+        <img
+          src={googleIcon}
+          alt="Icono de Google"
+          onClick={handleGoogleSignIn}
+        />
         <p onClick={handleGoogleSignIn}>Entrar con Google</p>
       </div>
     </div>
