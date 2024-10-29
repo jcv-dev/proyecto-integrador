@@ -1,41 +1,44 @@
 .home {
-  position: absolute;
+  position: relative; /* Cambiado a relative */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: center; /* Para que comience desde arriba */
   align-items: center;
-
-  height: 100vh;
   width: 100vw;
-  outline: auto;
-  top: 0;
+  min-height: 100vh; /* Para ocupar al menos toda la ventana */
+  padding-top: 20px; /* Espacio superior para la imagen */
+  overflow-y: auto; /* Permitir desplazamiento si el contenido es largo */
 }
+
 
 .title {
   position: relative;
   width: 100vw;
   height: auto;
   line-height: 1;
-  margin-bottom: 10px;
-  top: 0%;
+  margin-bottom: 5px;
+  text-align: center; /* Centra el título */
+  margin-top: 4%;
 }
 
-.scene-container {
-  aspect-ratio: 16/9;
-  width: 80%;
-  height: auto;
-  display: flex;
-  outline: auto;
-  border-radius: 25px;
-  transition: all 0.5s ease;
+.content-text {
+  position: relative;
+  width: clamp(300px, 80vw, 1000px);
+  line-height: normal;
+  font-size: 1.5em;
+  text-align: left;
+}
+
+.subtitle{
+  font-size: 1.5em;
 }
 
 .user-photo {
   aspect-ratio: 1/1;
   position: absolute;
   width: clamp(50px, 20vw, 50px);
-  right: 2%; 
-  top: 2%;
+  right: 15px; 
+  top: 15px;
 }
 
 .user-photo img {
