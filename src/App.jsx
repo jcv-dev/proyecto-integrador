@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import Test from "./components/Test";
+import Experiences from "./components/Experiences";
 import RequireAuth from "./components/RequireAuth";
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
         <Route element={<RequireAuth />}>
           <Route path="/home" element={<Home />} />
           <Route path="/test" element={<Test />} />
+          <Route path="/experience" element={<Experiences />} />
         </Route>
       </Routes>
     </Router>
