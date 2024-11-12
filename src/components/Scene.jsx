@@ -1,12 +1,12 @@
 import { Canvas } from "@react-three/fiber";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Html } from "@react-three/drei";
 import World from "./3d-models/World";
 import "../css/StartText.css";
 import * as THREE from "three";
 
-const Scene = ({ scene }) => {
+const Scene = ({ scene, home, chapter }) => {
   const [chapterIndex, setChapterIndex] = useState(0);
   const [previousIndex, setPreviousIndex] = useState(0); // Track previous index
   const cameraRef = useRef();
@@ -44,6 +44,10 @@ const Scene = ({ scene }) => {
       start[2] + (end[2] - start[2]) * alpha
     );
   };
+
+  useCallback(() => {
+    nextChapter();
+  }, [chapter]);
 
   useEffect(() => {
     if (controlsRef.current) {
@@ -194,14 +198,6 @@ const Scene = ({ scene }) => {
     }
   };
 
-  const prevChapter = () => {
-    if (!isAnimating && chapterIndex > 0) {
-      setPreviousIndex(chapterIndex); // Store current index before changing
-      setChapterIndex((prev) => prev - 1);
-      setIsAnimating(true);
-    }
-  };
-
   return (
     <div style={{ aspectRatio: "16/9" }}>
       <Canvas
@@ -240,7 +236,7 @@ const Scene = ({ scene }) => {
           position={htmlPosition}
           rotation={[-0.2, 0, 0]}
           style={
-            chapterIndex === 0
+            chapterIndex === 0 && !home
               ? { color: "purple", fontSize: "14pt" }
               : { opacity: "0", color: "purple", fontSize: "14pt" }
           }
