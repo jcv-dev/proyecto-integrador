@@ -1,10 +1,10 @@
 import { Canvas } from "@react-three/fiber";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera, Sky, Clouds, Cloud } from "@react-three/drei";
 import { Html } from "@react-three/drei";
+import * as THREE from "three";
 import World from "./3d-models/World";
 import "../css/StartText.css";
-import * as THREE from "three";
 
 const Scene = ({ scene, home, chapter }) => {
   const [chapterIndex, setChapterIndex] = useState(0);
@@ -254,6 +254,16 @@ const Scene = ({ scene, home, chapter }) => {
             </button>
           </div>
         </Html>
+        <Sky
+          distance={45}
+          sunPosition={[0, 80, 0]}
+          inclination={0}
+          azimuth={0.25}
+        />
+        <Clouds material={THREE.MeshBasicMaterial}>
+          <Cloud segments={40} bounds={[10, 20, 20]} volume={10} color="orange" />
+          <Cloud seed={1} scale={2} volume={5} color="hotpink" fade={100} />
+        </Clouds>
         <World receiveShadow castShadow />
       </Canvas>
     </div>
