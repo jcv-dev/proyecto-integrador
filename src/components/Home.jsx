@@ -2,7 +2,7 @@ import userStore from "../stores/userStore";
 import "../css/Home.css";
 import useSignOutAndNavigate from "../hooks/useSignOutAndNavigate";
 import { useCallback, useState } from "react";
-import Scene from "./Scene";
+import SceneHome from "./SceneHome";
 import { useNavigate } from "react-router-dom";
 
 const contentTexts = [
@@ -15,21 +15,22 @@ const buttonTexts = ["Siguiente", "Comenzar"];
 
 function Home() {
   const navigate = useNavigate();
-
+  const [chapter, setChapter] = useState(0);
   const user = userStore((state) => state.user);
   const signOutAndNavigate = useSignOutAndNavigate();
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+
   const changeContent = useCallback(() => {
     if (currentTextIndex >= contentTexts.length - 1) {
       navigate("/experience");
     }
-    setCurrentTextIndex(currentTextIndex + 1);
+    setCurrentTextIndex(currentTextIndex + 1); 
   });
 
   return (
     <div className="home">
       <div className="scene-container">
-        <Scene/>
+        <SceneHome />
       </div>
       <div className="user-photo">
         <img src={user?.photoURL} onClick={() => signOutAndNavigate()} />
@@ -42,10 +43,7 @@ function Home() {
           dangerouslySetInnerHTML={{ __html: contentTexts[currentTextIndex] }}
         />
       </div>
-      <div
-        className="next-button"
-        onClick={changeContent}
-      >
+      <div className="next-button" onClick={changeContent}>
         {buttonTexts[currentTextIndex]}
       </div>
     </div>
