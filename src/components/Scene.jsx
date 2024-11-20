@@ -1,10 +1,18 @@
 import { Canvas } from "@react-three/fiber";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { OrbitControls, PerspectiveCamera, Sky, Clouds, Cloud } from "@react-three/drei";
+import {
+  OrbitControls,
+  PerspectiveCamera,
+  Clouds,
+  Cloud,
+  Text3D,
+  Sky
+} from "@react-three/drei";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import World from "./3d-models/World";
 import "../css/StartText.css";
+import { Text } from "@react-three/drei";
 
 const Scene = ({ scene, home, chapter }) => {
   const [chapterIndex, setChapterIndex] = useState(0);
@@ -21,7 +29,7 @@ const Scene = ({ scene, home, chapter }) => {
     },
     {
       position: [-20, -10, -50],
-      lookAt: [-2, -25, -55],
+      lookAt: [-2, -28, -55],
     },
     {
       position: [60, -35, -25],
@@ -90,19 +98,6 @@ const Scene = ({ scene, home, chapter }) => {
         cameraRef.current.updateMatrixWorld();
         controlsRef.current.update();
 
-        console.log("Camera Position:", {
-          x: cameraRef.current.position.x.toFixed(4),
-          y: cameraRef.current.position.y.toFixed(4),
-          z: cameraRef.current.position.z.toFixed(4),
-          lookAtX: controlsRef.current.target.x.toFixed(4),
-          lookAtY: controlsRef.current.target.y.toFixed(4),
-          lookAtZ: controlsRef.current.target.z.toFixed(4),
-          progress: progress.toFixed(4),
-          eased: eased.toFixed(4),
-          from: previousIndex,
-          to: chapterIndex,
-        });
-
         animationFrame = requestAnimationFrame(animate);
       } else {
         if (cameraRef.current && controlsRef.current) {
@@ -120,38 +115,12 @@ const Scene = ({ scene, home, chapter }) => {
 
           cameraRef.current.lookAt(controlsRef.current.target);
           cameraRef.current.updateMatrixWorld();
-
-          console.log("Final Camera Position:", {
-            x: cameraRef.current.position.x.toFixed(4),
-            y: cameraRef.current.position.y.toFixed(4),
-            z: cameraRef.current.position.z.toFixed(4),
-            lookAtX: controlsRef.current.target.x.toFixed(4),
-            lookAtY: controlsRef.current.target.y.toFixed(4),
-            lookAtZ: controlsRef.current.target.z.toFixed(4),
-            progress: "1.0000",
-            eased: "1.0000",
-            from: previousIndex,
-            to: chapterIndex,
-          });
         }
         setIsAnimating(false);
       }
     };
 
     if (isAnimating && cameraRef.current && controlsRef.current) {
-      console.log("Initial Camera Position:", {
-        x: cameraRef.current.position.x.toFixed(4),
-        y: cameraRef.current.position.y.toFixed(4),
-        z: cameraRef.current.position.z.toFixed(4),
-        lookAtX: controlsRef.current.target.x.toFixed(4),
-        lookAtY: controlsRef.current.target.y.toFixed(4),
-        lookAtZ: controlsRef.current.target.z.toFixed(4),
-        progress: "0.0000",
-        eased: "0.0000",
-        from: previousIndex,
-        to: chapterIndex,
-      });
-
       animationFrame = requestAnimationFrame(animate);
     }
 
@@ -207,7 +176,7 @@ const Scene = ({ scene, home, chapter }) => {
           width: "100%",
           height: "100%",
           borderRadius: "25px",
-          backgroundColor: "#94d4ed",
+          backgroundColor: "#94d4ed", // Background color for fallback
         }}
       >
         <PerspectiveCamera
@@ -227,6 +196,41 @@ const Scene = ({ scene, home, chapter }) => {
         />
         <ambientLight intensity={0.5} />
         <directionalLight position={[-10, 10, 10]} intensity={0.5} castShadow />
+
+        {/* Add the Sky component */}
+        <Sky
+          distance={450000} // Distance of the sky dome
+          sunPosition={[100, 20, 100]} // Position of the sun
+          turbidity={10} // Cloudiness
+          rayleigh={2} // Scattering effect
+          mieCoefficient={0.005} // Mie scattering coefficient
+          mieDirectionalG={0.8} // Anisotropy factor
+          inclination={0.5} // Elevation angle
+          azimuth={0.25} // Azimuth angle
+        />
+
+        {/* Clouds spread across the sky */}
+        <Clouds>
+          {Array.from({ length: 15 }).map((_, index) => (
+            <Cloud
+              key={index}
+              position={[
+                (Math.random() - 0.5) * 200, // Spread across X-axis
+                50 + Math.random() * 50, // Spread across Y-axis (higher sky)
+                (Math.random() - 0.5) * 200, // Spread across Z-axis
+              ]}
+              scale={[
+                4 + Math.random() * 3, // Randomize size
+                2 + Math.random() * 2,
+                1 + Math.random(),
+              ]}
+              opacity={1} // Fully opaque for white clouds
+              speed={0.1 + Math.random() * 0.2} // Subtle variation in movement speed
+              segments={20 + Math.floor(Math.random() * 10)} // Vary segments for detail
+            />
+          ))}
+        </Clouds>
+
         <Html
           occlude
           wrapperClass="welcome-text"
@@ -254,16 +258,22 @@ const Scene = ({ scene, home, chapter }) => {
             </button>
           </div>
         </Html>
-        <Sky
-          distance={45}
-          sunPosition={[0, 80, 0]}
-          inclination={0}
-          azimuth={0.25}
-        />
-        <Clouds material={THREE.MeshBasicMaterial}>
-          <Cloud segments={40} bounds={[10, 20, 20]} volume={10} color="orange" />
-          <Cloud seed={1} scale={2} volume={5} color="hotpink" fade={100} />
-        </Clouds>
+
+        <Text
+          fontSize={0.5}
+          position={[-6, -21, -50]}
+          rotation={[0, -1.5, 0]}
+          color={"white"}
+          fontWeight={800}
+          textAlign={"center"}
+          transform
+          anchorX={"center"}
+          anchorY={"top"}
+        >
+          {
+            "Las ardillas dependen de los árboles \npara construir nidos, refugiarse de \ndepredadores y desplazarse.\nLa tala masiva de árboles \nreduce los espacios donde pueden vivir,\nobligándolas a migrar a otros lugares, \na menudo menos adecuados.\n \nPuedes usar las flechas de tu teclado \npara navegar por la escena..."
+          }
+        </Text>
         <World receiveShadow castShadow />
       </Canvas>
     </div>
