@@ -6,13 +6,17 @@ import {
   Clouds,
   Cloud,
   Text3D,
-  Sky
+  Sky,
 } from "@react-three/drei";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import World from "./3d-models/World";
 import "../css/StartText.css";
 import { Text } from "@react-three/drei";
+import Wolf from "./3d-models/Wolf";
+import Centipede from "./3d-models/Centipede";
+import { Physics } from "@react-three/rapier";
+import Floor from "./3d-models/Floor";
 
 const Scene = ({ scene, home, chapter }) => {
   const [chapterIndex, setChapterIndex] = useState(0);
@@ -36,12 +40,12 @@ const Scene = ({ scene, home, chapter }) => {
       lookAt: [45, -25, -50],
     },
     {
-      position: [-65, -25, -70],
-      lookAt: [-60, -2, -50],
-    },
-    {
       position: [60, -5, 10],
       lookAt: [55, -20, 15],
+    },
+    {
+      position: [-65, -25, -70],
+      lookAt: [-60, -2, -50],
     },
   ];
 
@@ -258,7 +262,21 @@ const Scene = ({ scene, home, chapter }) => {
             </button>
           </div>
         </Html>
-
+        <Text3D
+          fontSize={0.5}
+          position={[-6, -20, -54]}
+          rotation={[0, -1.5, 0]}
+          color={"white"}
+          fontWeight={800}
+          textAlign={"center"}
+          transform
+          anchorX={"center"}
+          anchorY={"top"}
+          font={"/fonts/Sevillana_Regular.json"}
+          justify={"center"}
+        >
+          ¿Sabías qué...?
+        </Text3D>
         <Text
           fontSize={0.5}
           position={[-6, -21, -50]}
@@ -271,10 +289,85 @@ const Scene = ({ scene, home, chapter }) => {
           anchorY={"top"}
         >
           {
-            "Las ardillas dependen de los árboles \npara construir nidos, refugiarse de \ndepredadores y desplazarse.\nLa tala masiva de árboles \nreduce los espacios donde pueden vivir,\nobligándolas a migrar a otros lugares, \na menudo menos adecuados.\n \nPuedes usar las flechas de tu teclado \npara navegar por la escena..."
+            "La deforestación destruye el hábitat \nde los lobos, reduciendo sus presas y \nobligándolos a recorrer grandes distancias. \nEsto altera los ecosistemas y aumenta \nlos conflictos con los humanos.\n\nPuedes usar las flechas de tu teclado \npara navegar por la escena..."
           }
         </Text>
-        <World receiveShadow castShadow />
+        <Physics>
+          <Floor position={[0, -28.2, 0]} />
+          <Wolf
+            receiveShadow
+            castShadow
+            position={[-6, -25.5, -58]}
+            scale={[14, 14, 14]}
+            rotation={[0, -1.5, 0]}
+          />
+          <Text3D
+            fontSize={0.5}
+            position={[53, -22, -38]}
+            rotation={[0, 0, 0]}
+            color={"white"}
+            fontWeight={800}
+            textAlign={"center"}
+            transform
+            anchorX={"center"}
+            anchorY={"top"}
+            font={"/fonts/Sevillana_Regular.json"}
+            justify={"center"}
+          >
+            Además...
+          </Text3D>
+          <Text
+            fontSize={0.5}
+            position={[55, -22, -38]}
+            rotation={[0, 0, 0]}
+            color={"white"}
+            fontWeight={800}
+            textAlign={"center"}
+            transform
+            anchorX={"center"}
+            anchorY={"top"}
+          >
+            {
+              "La deforestación destruye el hábitat \nde los insectos, reduciendo sus fuentes \nde alimento y refugio. \nEsto obliga a muchas especies a desplazarse \ngrandes distancias en busca de nuevos entornos. \nEsta alteración de los ecosistemas afecta \nla polinización y el ciclo de nutrientes, \ny aumenta el riesgo de extinción\npara algunas especies."
+            }
+          </Text>
+          <Centipede
+            position={[50, -27, -30]}
+            scale={[18, 18, 18]}
+            rotation={[0, 1.5, 0]}
+          />
+          <Text3D
+            fontSize={0.5}
+            position={[64, -18, 15.5]}
+            rotation={[0, 3, 0]}
+            color={"white"}
+            fontWeight={800}
+            textAlign={"center"}
+            transform
+            anchorX={"center"}
+            anchorY={"top"}
+            font={"/fonts/Sevillana_Regular.json"}
+            justify={"center"}
+          >
+            No olvidemos...
+          </Text3D>
+          <Text
+            fontSize={0.5}
+            position={[61, -18, 15]}
+            rotation={[0, 3, 0]}
+            color={"white"}
+            fontWeight={800}
+            textAlign={"center"}
+            transform
+            anchorX={"center"}
+            anchorY={"top"}
+          >
+            {
+              "La deforestación aumenta el riesgo \nde incendios al eliminar la vegetación \nque ayuda a mantener la humedad \ndel suelo. Esto deja grandes áreas \nde material combustible, facilitando \nla propagación del fuego."
+            }
+          </Text>
+          <World />
+        </Physics>
       </Canvas>
     </div>
   );
