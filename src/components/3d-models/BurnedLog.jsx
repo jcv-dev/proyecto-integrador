@@ -4,7 +4,6 @@ import { RigidBody } from "@react-three/rapier";
 export default function BurnedLog(props) {
   const { nodes, materials } = useGLTF("models/burned_log.glb");
   return (
-    <RigidBody>
       <group {...props} dispose={null}>
         <group name="Sketchfab_Scene">
           <group name="Sketchfab_model" rotation={[-Math.PI / 2, 0, 0]}>
@@ -20,7 +19,6 @@ export default function BurnedLog(props) {
           </group>
         </group>
       </group>
-    </RigidBody>
   );
 }
 
