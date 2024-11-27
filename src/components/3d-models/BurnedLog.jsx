@@ -2,7 +2,7 @@ import { useGLTF } from "@react-three/drei";
 import { RigidBody } from "@react-three/rapier";
 
 export default function BurnedLog(props) {
-  const { nodes, materials } = useGLTF("/models/burned_log.glb");
+  const { nodes, materials } = useGLTF("models/burned_log.glb");
   return (
     <RigidBody>
       <group {...props} dispose={null}>
@@ -24,4 +24,4 @@ export default function BurnedLog(props) {
   );
 }
 
-useGLTF.preload("/models/burned_log.glb");
+useGLTF.preload("models/burned_log.glb");
