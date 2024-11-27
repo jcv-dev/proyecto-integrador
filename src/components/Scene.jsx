@@ -18,7 +18,7 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 import { Physics } from "@react-three/rapier";
-
+import { RigidBody } from "@react-three/rapier";
 import World from "./3d-models/World";
 import Floor from "./3d-models/Floor";
 import Wolf from "./3d-models/Wolf";
@@ -26,6 +26,14 @@ import Centipede from "./3d-models/Centipede";
 import BurnedLog from "./3d-models/BurnedLog";
 
 import "../css/StartText.css";
+
+const LOG_POSITIONS = [
+  { pos: [68, -25, 12], rot: [1, 6, 67] },
+  { pos: [65, -24, 16], rot: [0, 4, 3] },
+  { pos: [65, -24, 24], rot: [1.5, 4, 2.7] },
+  { pos: [58, -24, 24], rot: [2, 4, 3.2] },
+  { pos: [58, -20, 24], rot: [3, 4, 3.2] },
+];
 
 const CHAPTERS = [
   {
@@ -192,6 +200,57 @@ const Scene = React.memo(({ scene, home, chapter }) => {
       )),
     []
   );
+
+  const [clickedLogs, setClickedLogs] = useState(new Set());
+
+  const handleLogClick = useCallback((index) => {
+    setClickedLogs((prev) => {
+      const newSet = new Set(prev);
+      newSet.add(index);
+      return newSet;
+    });
+  }, []);
+
+  const InteractiveLog = React.memo(({ index, pos, rot }) => {
+    const rigidBodyRef = useRef();
+
+    useEffect(() => {
+      if (clickedLogs.has(index) && rigidBodyRef.current) {
+        const impulseStrength = 1;
+        const impulseDirection = new THREE.Vector3(
+          (Math.random() - 0.5) * impulseStrength,
+          impulseStrength,
+          (Math.random() - 0.5) * impulseStrength
+        );
+
+        rigidBodyRef.current.applyImpulse(impulseDirection, true);
+      }
+    }, [clickedLogs, index]);
+
+    return (
+      <RigidBody
+        ref={rigidBodyRef}
+        type="dynamic"
+        mass={10}
+        position={pos}
+        rotation={rot}
+      >
+        <group
+          scale={[0.1, 0.1, 0.1]}
+          onClick={() => handleLogClick(index)}
+          onPointerOver={(e) => {
+            document.body.style.cursor = "pointer";
+            e.stopPropagation();
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = "default";
+          }}
+        >
+          <BurnedLog />
+        </group>
+      </RigidBody>
+    );
+  });
 
   return (
     <div style={{ aspectRatio: "16/9" }}>
@@ -369,31 +428,16 @@ const Scene = React.memo(({ scene, home, chapter }) => {
               "La deforestación aumenta el riesgo \nde incendios al eliminar la vegetación \nque ayuda a mantener la humedad \ndel suelo. Esto deja grandes áreas \nde material combustible, facilitando \nla propagación del fuego."
             }
           </Text>
-          <BurnedLog
-            position={[68, -25, 12]}
-            scale={[0.1, 0.1, 0.1]}
-            rotation={[1, 6, 67]}
-          />
-          <BurnedLog
-            position={[65, -24, 16]}
-            scale={[0.1, 0.1, 0.1]}
-            rotation={[0, 4, 3]}
-          />
-          <BurnedLog
-            position={[65, -24, 24]}
-            scale={[0.1, 0.1, 0.1]}
-            rotation={[1.5, 4, 2.7]}
-          />
-          <BurnedLog
-            position={[58, -24, 24]}
-            scale={[0.1, 0.1, 0.1]}
-            rotation={[2, 4, 3.2]}
-          />
-          <BurnedLog
-            position={[58, -20, 24]}
-            scale={[0.1, 0.1, 0.1]}
-            rotation={[3, 4, 3.2]}
-          />
+
+          {LOG_POSITIONS.map((log, index) => (
+            <InteractiveLog
+              key={index}
+              index={index}
+              pos={log.pos}
+              rot={log.rot}
+            />
+          ))}
+
           <World />
         </Physics>
       </Canvas>
