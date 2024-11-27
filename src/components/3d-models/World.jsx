@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import { useGLTF } from "@react-three/drei";
-import { RigidBody } from "@react-three/rapier";
 
 export default function World(props) {
   const { nodes, materials } = useGLTF("/models/world.glb");

@@ -1,5 +1,11 @@
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import { Canvas } from "@react-three/fiber";
-import { useState, useRef, useEffect, useCallback } from "react";
 import {
   OrbitControls,
   PerspectiveCamera,
@@ -7,71 +13,107 @@ import {
   Cloud,
   Text3D,
   Sky,
+  Html,
+  Text,
 } from "@react-three/drei";
-import { Html } from "@react-three/drei";
 import * as THREE from "three";
+import { Physics } from "@react-three/rapier";
+
 import World from "./3d-models/World";
-import "../css/StartText.css";
-import { Text } from "@react-three/drei";
+import Floor from "./3d-models/Floor";
 import Wolf from "./3d-models/Wolf";
 import Centipede from "./3d-models/Centipede";
-import { Physics } from "@react-three/rapier";
-import Floor from "./3d-models/Floor";
+import BurnedLog from "./3d-models/BurnedLog";
 
-const Scene = ({ scene, home, chapter }) => {
+import "../css/StartText.css";
+
+const CHAPTERS = [
+  {
+    position: [-2, 0, 8],
+    lookAt: [-2, -2, -10],
+  },
+  {
+    position: [-20, -10, -50],
+    lookAt: [-2, -28, -55],
+  },
+  {
+    position: [60, -35, -25],
+    lookAt: [45, -25, -50],
+  },
+  {
+    position: [60, -25, -3],
+    lookAt: [55, -20, 15],
+  },
+  {
+    position: [-65, -25, -70],
+    lookAt: [-60, -2, -50],
+  },
+];
+
+const lerpVector = (start, end, alpha) => {
+  return new THREE.Vector3(
+    start[0] + (end[0] - start[0]) * alpha,
+    start[1] + (end[1] - start[1]) * alpha,
+    start[2] + (end[2] - start[2]) * alpha
+  );
+};
+
+const Scene = React.memo(({ scene, home, chapter }) => {
   const [chapterIndex, setChapterIndex] = useState(0);
-  const [previousIndex, setPreviousIndex] = useState(0); // Track previous index
+  const [previousIndex, setPreviousIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
   const cameraRef = useRef();
   const controlsRef = useRef();
-  const [isAnimating, setIsAnimating] = useState(false);
-  const htmlPosition = new THREE.Vector3(-2, -2, -10);
 
-  const chapters = [
-    {
-      position: [-2, 0, 8],
-      lookAt: [-2, -2, -10],
-    },
-    {
-      position: [-20, -10, -50],
-      lookAt: [-2, -28, -55],
-    },
-    {
-      position: [60, -35, -25],
-      lookAt: [45, -25, -50],
-    },
-    {
-      position: [60, -5, 10],
-      lookAt: [55, -20, 15],
-    },
-    {
-      position: [-65, -25, -70],
-      lookAt: [-60, -2, -50],
-    },
-  ];
+  const htmlPosition = useMemo(() => new THREE.Vector3(-2, -2, -10), []);
 
-  const lerpVector = (start, end, alpha) => {
-    return new THREE.Vector3(
-      start[0] + (end[0] - start[0]) * alpha,
-      start[1] + (end[1] - start[1]) * alpha,
-      start[2] + (end[2] - start[2]) * alpha
-    );
-  };
-
-  useCallback(() => {
-    nextChapter();
-  }, [chapter]);
+  const handleNextChapter = useCallback(() => {
+    if (!isAnimating && chapterIndex < CHAPTERS.length - 1) {
+      setPreviousIndex(chapterIndex);
+      setChapterIndex((prev) => prev + 1);
+      setIsAnimating(true);
+    }
+  }, [chapterIndex, isAnimating]);
 
   useEffect(() => {
-    if (controlsRef.current) {
-      const target = new THREE.Vector3(...chapters[chapterIndex].lookAt);
-      controlsRef.current.target.copy(target);
+    if (chapter) {
+      handleNextChapter();
     }
-  }, [chapterIndex]);
+  }, [chapter, handleNextChapter]);
+
+  useEffect(() => {
+    const handleKeyNavigation = (event) => {
+      if (isAnimating) return;
+
+      switch (event.key) {
+        case "ArrowRight":
+          if (chapterIndex < CHAPTERS.length - 1) {
+            setPreviousIndex(chapterIndex);
+            setChapterIndex((prev) => prev + 1);
+            setIsAnimating(true);
+          }
+          break;
+        case "ArrowLeft":
+          if (chapterIndex > 0) {
+            setPreviousIndex(chapterIndex);
+            setChapterIndex((prev) => prev - 1);
+            setIsAnimating(true);
+          }
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyNavigation);
+    return () => window.removeEventListener("keydown", handleKeyNavigation);
+  }, [chapterIndex, isAnimating]);
 
   useEffect(() => {
     let animationFrame;
-    let startTime;
     const duration = 1000;
+    let startTime;
 
     const animate = (currentTime) => {
       if (!startTime) startTime = currentTime;
@@ -80,10 +122,10 @@ const Scene = ({ scene, home, chapter }) => {
       const eased = 1 - Math.pow(1 - progress, 4);
 
       if (progress < 1 && cameraRef.current && controlsRef.current) {
-        const startPos = chapters[previousIndex].position; // Use previousIndex
-        const endPos = chapters[chapterIndex].position;
-        const startLookAt = chapters[previousIndex].lookAt; // Use previousIndex
-        const endLookAt = chapters[chapterIndex].lookAt;
+        const startPos = CHAPTERS[previousIndex].position;
+        const endPos = CHAPTERS[chapterIndex].position;
+        const startLookAt = CHAPTERS[previousIndex].lookAt;
+        const endLookAt = CHAPTERS[chapterIndex].lookAt;
 
         const currentPos = lerpVector(startPos, endPos, eased);
         const currentTarget = lerpVector(startLookAt, endLookAt, eased);
@@ -93,30 +135,23 @@ const Scene = ({ scene, home, chapter }) => {
           currentPos.y,
           currentPos.z
         );
-
         controlsRef.current.target.copy(
-          new THREE.Vector3(currentTarget.x, currentTarget.y, currentTarget.z)
+          new THREE.Vector3(...currentTarget.toArray())
         );
-
         cameraRef.current.lookAt(controlsRef.current.target);
+
         cameraRef.current.updateMatrixWorld();
         controlsRef.current.update();
 
         animationFrame = requestAnimationFrame(animate);
       } else {
         if (cameraRef.current && controlsRef.current) {
-          const finalPos = chapters[chapterIndex].position;
-          const finalLookAt = chapters[chapterIndex].lookAt;
+          const finalPos = CHAPTERS[chapterIndex].position;
+          const finalLookAt = CHAPTERS[chapterIndex].lookAt;
 
-          cameraRef.current.position.set(finalPos[0], finalPos[1], finalPos[2]);
-
-          controlsRef.current.target.set(
-            finalLookAt[0],
-            finalLookAt[1],
-            finalLookAt[2]
-          );
+          cameraRef.current.position.set(...finalPos);
+          controlsRef.current.target.set(...finalLookAt);
           controlsRef.current.update();
-
           cameraRef.current.lookAt(controlsRef.current.target);
           cameraRef.current.updateMatrixWorld();
         }
@@ -135,41 +170,28 @@ const Scene = ({ scene, home, chapter }) => {
     };
   }, [chapterIndex, isAnimating, previousIndex]);
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (isAnimating) return;
-
-      switch (event.key) {
-        case "ArrowRight":
-          if (chapterIndex < chapters.length - 1) {
-            setPreviousIndex(chapterIndex); // Store current index before changing
-            setChapterIndex((prev) => prev + 1);
-            setIsAnimating(true);
-          }
-          break;
-        case "ArrowLeft":
-          if (chapterIndex > 0) {
-            setPreviousIndex(chapterIndex); // Store current index before changing
-            setChapterIndex((prev) => prev - 1);
-            setIsAnimating(true);
-          }
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [chapterIndex, isAnimating, chapters.length]);
-
-  const nextChapter = () => {
-    if (!isAnimating && chapterIndex < chapters.length - 1) {
-      setPreviousIndex(chapterIndex); // Store current index before changing
-      setChapterIndex((prev) => prev + 1);
-      setIsAnimating(true);
-    }
-  };
+  const renderClouds = useMemo(
+    () =>
+      Array.from({ length: 15 }).map((_, index) => (
+        <Cloud
+          key={index}
+          position={[
+            (Math.random() - 0.5) * 200,
+            50 + Math.random() * 50,
+            (Math.random() - 0.5) * 200,
+          ]}
+          scale={[
+            4 + Math.random() * 3,
+            2 + Math.random() * 2,
+            1 + Math.random(),
+          ]}
+          opacity={1}
+          speed={0.1 + Math.random() * 0.2}
+          segments={20 + Math.floor(Math.random() * 10)}
+        />
+      )),
+    []
+  );
 
   return (
     <div style={{ aspectRatio: "16/9" }}>
@@ -180,13 +202,13 @@ const Scene = ({ scene, home, chapter }) => {
           width: "100%",
           height: "100%",
           borderRadius: "25px",
-          backgroundColor: "#94d4ed", // Background color for fallback
+          backgroundColor: "#94d4ed",
         }}
       >
         <PerspectiveCamera
           ref={cameraRef}
           makeDefault
-          position={chapters[chapterIndex].position}
+          position={CHAPTERS[chapterIndex].position}
         />
         <OrbitControls
           ref={controlsRef}
@@ -196,44 +218,23 @@ const Scene = ({ scene, home, chapter }) => {
           minAzimuthAngle={chapterIndex === 0 ? -Math.PI / 2 : undefined}
           maxAzimuthAngle={chapterIndex === 0 ? Math.PI / 2 : undefined}
           enableZoom={false}
-          target={new THREE.Vector3(...chapters[chapterIndex].lookAt)}
+          target={new THREE.Vector3(...CHAPTERS[chapterIndex].lookAt)}
         />
         <ambientLight intensity={0.5} />
         <directionalLight position={[-10, 10, 10]} intensity={0.5} castShadow />
 
-        {/* Add the Sky component */}
         <Sky
-          distance={450000} // Distance of the sky dome
-          sunPosition={[100, 20, 100]} // Position of the sun
-          turbidity={10} // Cloudiness
-          rayleigh={2} // Scattering effect
-          mieCoefficient={0.005} // Mie scattering coefficient
-          mieDirectionalG={0.8} // Anisotropy factor
-          inclination={0.5} // Elevation angle
-          azimuth={0.25} // Azimuth angle
+          distance={450000}
+          sunPosition={[100, 20, 100]}
+          turbidity={10}
+          rayleigh={2}
+          mieCoefficient={0.005}
+          mieDirectionalG={0.8}
+          inclination={0.5}
+          azimuth={0.25}
         />
 
-        {/* Clouds spread across the sky */}
-        <Clouds>
-          {Array.from({ length: 15 }).map((_, index) => (
-            <Cloud
-              key={index}
-              position={[
-                (Math.random() - 0.5) * 200, // Spread across X-axis
-                50 + Math.random() * 50, // Spread across Y-axis (higher sky)
-                (Math.random() - 0.5) * 200, // Spread across Z-axis
-              ]}
-              scale={[
-                4 + Math.random() * 3, // Randomize size
-                2 + Math.random() * 2,
-                1 + Math.random(),
-              ]}
-              opacity={1} // Fully opaque for white clouds
-              speed={0.1 + Math.random() * 0.2} // Subtle variation in movement speed
-              segments={20 + Math.floor(Math.random() * 10)} // Vary segments for detail
-            />
-          ))}
-        </Clouds>
+        <Clouds>{renderClouds}</Clouds>
 
         <Html
           occlude
@@ -257,11 +258,12 @@ const Scene = ({ scene, home, chapter }) => {
               <br />
               ¿Deseas continuar?
             </div>
-            <button onClick={nextChapter} disabled={isAnimating}>
+            <button onClick={handleNextChapter} disabled={isAnimating}>
               Iniciar
             </button>
           </div>
         </Html>
+
         <Text3D
           fontSize={0.5}
           position={[-6, -20, -54]}
@@ -292,6 +294,7 @@ const Scene = ({ scene, home, chapter }) => {
             "La deforestación destruye el hábitat \nde los lobos, reduciendo sus presas y \nobligándolos a recorrer grandes distancias. \nEsto altera los ecosistemas y aumenta \nlos conflictos con los humanos.\n\nPuedes usar las flechas de tu teclado \npara navegar por la escena..."
           }
         </Text>
+
         <Physics>
           <Floor position={[0, -28.2, 0]} />
           <Wolf
@@ -366,11 +369,36 @@ const Scene = ({ scene, home, chapter }) => {
               "La deforestación aumenta el riesgo \nde incendios al eliminar la vegetación \nque ayuda a mantener la humedad \ndel suelo. Esto deja grandes áreas \nde material combustible, facilitando \nla propagación del fuego."
             }
           </Text>
+          <BurnedLog
+            position={[68, -25, 12]}
+            scale={[0.1, 0.1, 0.1]}
+            rotation={[1, 6, 67]}
+          />
+          <BurnedLog
+            position={[65, -24, 16]}
+            scale={[0.1, 0.1, 0.1]}
+            rotation={[0, 4, 3]}
+          />
+          <BurnedLog
+            position={[65, -24, 24]}
+            scale={[0.1, 0.1, 0.1]}
+            rotation={[1.5, 4, 2.7]}
+          />
+          <BurnedLog
+            position={[58, -24, 24]}
+            scale={[0.1, 0.1, 0.1]}
+            rotation={[2, 4, 3.2]}
+          />
+          <BurnedLog
+            position={[58, -20, 24]}
+            scale={[0.1, 0.1, 0.1]}
+            rotation={[3, 4, 3.2]}
+          />
           <World />
         </Physics>
       </Canvas>
     </div>
   );
-};
+});
 
 export default Scene;
