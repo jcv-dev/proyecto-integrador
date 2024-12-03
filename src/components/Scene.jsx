@@ -18,23 +18,16 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 import { Physics } from "@react-three/rapier";
-import { RigidBody } from "@react-three/rapier";
 import World from "./3d-models/World";
 import Floor from "./3d-models/Floor";
 import Wolf from "./3d-models/Wolf";
 import Centipede from "./3d-models/Centipede";
 import BurnedLog from "./3d-models/BurnedLog";
+import PostProcessing from "./PostProcessing";
 
 import "../css/StartText.css";
 
-const LOG_POSITIONS = [
-  { pos: [68, -25, 12], rot: [1, 6, 67] },
-  { pos: [65, -24, 16], rot: [0, 4, 3] },
-  { pos: [65, -24, 24], rot: [1.5, 4, 2.7] },
-  { pos: [58, -24, 24], rot: [2, 4, 3.2] },
-  { pos: [58, -20, 24], rot: [3, 4, 3.2] },
-];
-
+// Memoize constant values to prevent unnecessary re-creations
 const CHAPTERS = [
   {
     position: [-2, 0, 8],
@@ -58,6 +51,7 @@ const CHAPTERS = [
   },
 ];
 
+// Optimize vector lerping function
 const lerpVector = (start, end, alpha) => {
   return new THREE.Vector3(
     start[0] + (end[0] - start[0]) * alpha,
@@ -74,8 +68,34 @@ const Scene = React.memo(({ scene, home, chapter }) => {
   const cameraRef = useRef();
   const controlsRef = useRef();
 
+  // Memoize expensive computations
   const htmlPosition = useMemo(() => new THREE.Vector3(-2, -2, -10), []);
 
+  // Memoize cloud rendering to prevent unnecessary re-renders
+  const renderClouds = useMemo(
+    () =>
+      Array.from({ length: 15 }).map((_, index) => (
+        <Cloud
+          key={index}
+          position={[
+            (Math.random() - 0.5) * 200,
+            50 + Math.random() * 50,
+            (Math.random() - 0.5) * 200,
+          ]}
+          scale={[
+            4 + Math.random() * 3,
+            2 + Math.random() * 2,
+            1 + Math.random(),
+          ]}
+          opacity={1}
+          speed={0.1 + Math.random() * 0.2}
+          segments={20 + Math.floor(Math.random() * 10)}
+        />
+      )),
+    []
+  );
+
+  // Optimize chapter navigation with useCallback
   const handleNextChapter = useCallback(() => {
     if (!isAnimating && chapterIndex < CHAPTERS.length - 1) {
       setPreviousIndex(chapterIndex);
@@ -84,12 +104,14 @@ const Scene = React.memo(({ scene, home, chapter }) => {
     }
   }, [chapterIndex, isAnimating]);
 
+  // Trigger chapter change when chapter prop changes
   useEffect(() => {
     if (chapter) {
       handleNextChapter();
     }
   }, [chapter, handleNextChapter]);
 
+  // Keyboard navigation effect
   useEffect(() => {
     const handleKeyNavigation = (event) => {
       if (isAnimating) return;
@@ -118,6 +140,7 @@ const Scene = React.memo(({ scene, home, chapter }) => {
     return () => window.removeEventListener("keydown", handleKeyNavigation);
   }, [chapterIndex, isAnimating]);
 
+  // Camera animation effect
   useEffect(() => {
     let animationFrame;
     const duration = 1000;
@@ -178,80 +201,6 @@ const Scene = React.memo(({ scene, home, chapter }) => {
     };
   }, [chapterIndex, isAnimating, previousIndex]);
 
-  const renderClouds = useMemo(
-    () =>
-      Array.from({ length: 15 }).map((_, index) => (
-        <Cloud
-          key={index}
-          position={[
-            (Math.random() - 0.5) * 200,
-            50 + Math.random() * 50,
-            (Math.random() - 0.5) * 200,
-          ]}
-          scale={[
-            4 + Math.random() * 3,
-            2 + Math.random() * 2,
-            1 + Math.random(),
-          ]}
-          opacity={1}
-          speed={0.1 + Math.random() * 0.2}
-          segments={20 + Math.floor(Math.random() * 10)}
-        />
-      )),
-    []
-  );
-
-  const [clickedLogs, setClickedLogs] = useState(new Set());
-
-  const handleLogClick = useCallback((index) => {
-    setClickedLogs((prev) => {
-      const newSet = new Set(prev);
-      newSet.add(index);
-      return newSet;
-    });
-  }, []);
-
-  const InteractiveLog = React.memo(({ index, pos, rot }) => {
-    const rigidBodyRef = useRef();
-
-    useEffect(() => {
-      if (clickedLogs.has(index) && rigidBodyRef.current) {
-        const impulseStrength = 1;
-        const impulseDirection = new THREE.Vector3(
-          (Math.random() - 0.5) * impulseStrength,
-          impulseStrength,
-          (Math.random() - 0.5) * impulseStrength
-        );
-
-        rigidBodyRef.current.applyImpulse(impulseDirection, true);
-      }
-    }, [clickedLogs, index]);
-
-    return (
-      <RigidBody
-        ref={rigidBodyRef}
-        type="dynamic"
-        mass={10}
-        position={pos}
-        rotation={rot}
-      >
-        <group
-          scale={[0.1, 0.1, 0.1]}
-          onClick={() => handleLogClick(index)}
-          onPointerOver={(e) => {
-            document.body.style.cursor = "pointer";
-            e.stopPropagation();
-          }}
-          onPointerOut={() => {
-            document.body.style.cursor = "default";
-          }}
-        >
-          <BurnedLog />
-        </group>
-      </RigidBody>
-    );
-  });
-
   return (
     <div style={{ aspectRatio: "16/9" }}>
       <Canvas
@@ -264,6 +213,7 @@ const Scene = React.memo(({ scene, home, chapter }) => {
           backgroundColor: "#94d4ed",
         }}
       >
+        <PostProcessing />
         <PerspectiveCamera
           ref={cameraRef}
           makeDefault
@@ -322,39 +272,38 @@ const Scene = React.memo(({ scene, home, chapter }) => {
             </button>
           </div>
         </Html>
-
-        <Text3D
-          fontSize={0.5}
-          position={[-6, -20, -54]}
-          rotation={[0, -1.5, 0]}
-          color={"white"}
-          fontWeight={800}
-          textAlign={"center"}
-          transform
-          anchorX={"center"}
-          anchorY={"top"}
-          font={"/fonts/Sevillana_Regular.json"}
-          justify={"center"}
-        >
-          ¿Sabías qué...?
-        </Text3D>
-        <Text
-          fontSize={0.5}
-          position={[-6, -21, -50]}
-          rotation={[0, -1.5, 0]}
-          color={"white"}
-          fontWeight={800}
-          textAlign={"center"}
-          transform
-          anchorX={"center"}
-          anchorY={"top"}
-        >
-          {
-            "La deforestación destruye el hábitat \nde los lobos, reduciendo sus presas y \nobligándolos a recorrer grandes distancias. \nEsto altera los ecosistemas y aumenta \nlos conflictos con los humanos.\n\nPuedes usar las flechas de tu teclado \npara navegar por la escena..."
-          }
-        </Text>
-
         <Physics>
+          <Text3D
+            fontSize={0.5}
+            position={[-6, -20, -54]}
+            rotation={[0, -1.5, 0]}
+            color={"white"}
+            fontWeight={800}
+            textAlign={"center"}
+            transform
+            anchorX={"center"}
+            anchorY={"top"}
+            font={"/fonts/Sevillana_Regular.json"}
+            justify={"center"}
+          >
+            ¿Sabías qué...?
+          </Text3D>
+          <Text
+            fontSize={0.5}
+            position={[-6, -21, -50]}
+            rotation={[0, -1.5, 0]}
+            color={"white"}
+            fontWeight={800}
+            textAlign={"center"}
+            transform
+            anchorX={"center"}
+            anchorY={"top"}
+          >
+            {
+              "La deforestación destruye el hábitat \nde los lobos, reduciendo sus presas y \nobligándolos a recorrer grandes distancias. \nEsto altera los ecosistemas y aumenta \nlos conflictos con los humanos.\n\nPuedes usar las flechas de tu teclado \npara navegar por la escena..."
+            }
+          </Text>
+
           <Floor position={[0, -28.2, 0]} />
           <Wolf
             receiveShadow
@@ -429,14 +378,35 @@ const Scene = React.memo(({ scene, home, chapter }) => {
             }
           </Text>
 
-          {LOG_POSITIONS.map((log, index) => (
-            <InteractiveLog
-              key={index}
-              index={index}
-              pos={log.pos}
-              rot={log.rot}
-            />
-          ))}
+          <BurnedLog
+            position={[68, -20, 12]}
+            rotation={[1, 6, 67]}
+            scale={[0.1, 0.1, 0.1]}
+          />
+
+          <BurnedLog
+            position={[65, -24, 16]}
+            rotation={[0, 4, 3]}
+            scale={[0.1, 0.1, 0.1]}
+          />
+
+          <BurnedLog
+            position={[65, -24, 24]}
+            rotation={[1.5, 4, 2.7]}
+            scale={[0.1, 0.1, 0.1]}
+          />
+
+          <BurnedLog
+            position={[58, -24, 24]}
+            rotation={[2, 4, 3.2]}
+            scale={[0.1, 0.1, 0.1]}
+          />
+
+          <BurnedLog
+            position={[58, -20, 24]}
+            rotation={[3, 4, 3.2]}
+            scale={[0.1, 0.1, 0.1]}
+          />
 
           <World />
         </Physics>
