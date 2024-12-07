@@ -24,6 +24,8 @@ import Wolf from "./3d-models/Wolf";
 import Centipede from "./3d-models/Centipede";
 import BurnedLog from "./3d-models/BurnedLog";
 import PostProcessing from "./PostProcessing";
+import Video from "./Video";
+import { useNavigate } from "react-router-dom";
 
 import "../css/StartText.css";
 
@@ -201,6 +203,7 @@ const Scene = React.memo(({ scene, home, chapter }) => {
     };
   }, [chapterIndex, isAnimating, previousIndex]);
 
+  const navigate = useNavigate();
   return (
     <div style={{ aspectRatio: "16/9" }}>
       <Canvas
@@ -347,6 +350,12 @@ const Scene = React.memo(({ scene, home, chapter }) => {
             scale={[18, 18, 18]}
             rotation={[0, 1.5, 0]}
           />
+          <Video
+            path={"/videos/insect-video.mp4"}
+            position={[42, -24, -39]}
+            rotation={[0, 0.5, 0]}
+            scale={[6, 6, 6]}
+          />
           <Text3D
             fontSize={0.5}
             position={[64, -18, 15.5]}
@@ -378,6 +387,13 @@ const Scene = React.memo(({ scene, home, chapter }) => {
             }
           </Text>
 
+          <Video
+            path={"/videos/logs-video.mp4"}
+            position={[50, -16, 13]}
+            rotation={[0, 2.6, 0]}
+            scale={[6, 6, 6]}
+          />
+
           <BurnedLog
             position={[68, -20, 12]}
             rotation={[1, 6, 67]}
@@ -407,6 +423,39 @@ const Scene = React.memo(({ scene, home, chapter }) => {
             rotation={[3, 4, 3.2]}
             scale={[0.1, 0.1, 0.1]}
           />
+
+          <Video
+            path={"/videos/trees-video.mp4"}
+            position={[-56, -2, -60]}
+            rotation={[0, 3.4, 0]}
+            scale={[10, 10, 10]}
+          />
+          <Html
+            occlude
+            wrapperClass="welcome-text"
+            center
+            distanceFactor={15}
+            transform
+            position={[-71, -2, -60]}
+            rotation={[0, 3, 0]}
+            style={
+              chapterIndex === 0 && !home
+                ? { color: "purple", fontSize: "14pt" }
+                : { opacity: "1", color: "purple", fontSize: "14pt" }
+            }
+          >
+            <div className="start-container">
+              <div>
+                ¡Has finalizado la experiencia!
+                <br />
+                <br />
+                Ahora puedes probar tus conocimientos.
+              </div>
+              <button onClick={() => navigate("/quiz")} disabled={isAnimating}>
+                Quiz
+              </button>
+            </div>
+          </Html>
 
           <World />
         </Physics>

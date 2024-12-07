@@ -6,9 +6,15 @@ import {
   onAuthStateChanged,
   browserLocalPersistence,
   setPersistence,
-  signOut
+  signOut,
 } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -35,5 +41,6 @@ export {
   onAuthStateChanged,
   browserLocalPersistence,
   setPersistence,
-  signOut
+  signOut,
+  updateDoc,
 };

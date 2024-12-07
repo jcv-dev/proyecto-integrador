@@ -4,6 +4,7 @@ import Home from "./components/Home";
 import Test from "./components/Test";
 import Experiences from "./components/Experiences";
 import RequireAuth from "./components/RequireAuth";
+import Quiz from "./components/Quiz";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/test" element={<Test />} />
           <Route path="/experience" element={<Experiences />} />
+          <Route path="/quiz" element={<Quiz />} />
         </Route>
       </Routes>
     </Router>
