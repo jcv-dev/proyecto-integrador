@@ -6,7 +6,7 @@ export default function Floor(props) {
     <RigidBody type="fixed" {...props}>
       {/* Invisible collider */}
       <mesh receiveShadow>
-        <boxGeometry args={[150, 1, 150]} />
+        <boxGeometry args={[250, 1, 250]} />
         <meshStandardMaterial color="white" transparent={true} opacity={0} />
       </mesh>
     </RigidBody>

@@ -1,5 +1,4 @@
 import { Canvas } from "@react-three/fiber";
-import { useRef } from "react";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import World from "./3d-models/World";
 
